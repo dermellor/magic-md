@@ -34,9 +34,15 @@ Everything is a plugin. Three are bundled:
 | `01-image-embeds.py` | `![[image.ext]]` → standard Markdown images |
 | `02-callouts.py` | `> [!type]` → styled HTML divs |
 
-Add your own by dropping an executable script with a numeric prefix. Each plugin reads stdin, writes stdout. Remove bundled plugins you don't need.
+Add your own via `.magic-md.conf` in your project:
 
-See [SKILL.md](SKILL.md) for full documentation.
+```conf
+design=sipgate
+designs_dir=config/designs
+plugin=config/plugins/05-shortcodes.py
+```
+
+Extra plugins are sorted with bundled ones by filename prefix. See [SKILL.md](SKILL.md) for full documentation.
 
 ## License
 
