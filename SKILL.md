@@ -36,7 +36,26 @@ Font `url()` paths in CSS are automatically converted to Base64 data URIs, so th
 
 ## Plugins
 
-Plugins extend the Markdown preprocessing pipeline. They are executable scripts in `plugins/`, run in filename order before Pandoc. Each plugin reads Markdown from stdin and writes transformed Markdown to stdout.
+All preprocessing is done by plugins — executable scripts in `plugins/`, run in filename order before Pandoc. Each plugin reads Markdown from stdin and writes transformed Markdown to stdout.
+
+### Bundled plugins
+
+| Plugin | Description |
+|--------|-------------|
+| `01-image-embeds.py` | Resolves `![[image.ext]]` to standard Markdown image syntax |
+| `02-callouts.py` | Converts `> [!type]` callouts to styled HTML divs |
+
+Remove or replace any bundled plugin you don't need.
+
+### Environment variables
+
+`render.sh` exports these env vars for plugins to use (all optional):
+
+| Variable | Description |
+|----------|-------------|
+| `MAGIC_MD_INPUT_DIR` | Absolute path to the source file's directory |
+| `MAGIC_MD_VAULT_ROOT` | Root directory for file lookups (defaults to cwd) |
+| `MAGIC_MD_DESIGN` | Name of the active CSS design |
 
 ### Writing a plugin
 
@@ -45,20 +64,12 @@ Plugins extend the Markdown preprocessing pipeline. They are executable scripts 
 3. Read from stdin, write to stdout
 4. Exit 0 on success (non-zero skips the plugin with a warning)
 
-Example (`plugins/01-strip-comments.sh`):
+Example (`plugins/03-strip-comments.sh`):
 
 ```bash
 #!/usr/bin/env bash
 sed '/^%%/d'
 ```
-
-### Built-in preprocessing
-
-Before plugins run, the core preprocessor resolves:
-- `![[image.ext]]` embeds to standard Markdown image syntax
-- `> [!type]` callouts to styled HTML divs
-
-Set `VAULT_ROOT` env var if your Markdown references files relative to a vault root.
 
 ## Workflow
 

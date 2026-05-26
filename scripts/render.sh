@@ -46,12 +46,13 @@ fi
 
 CSS_CONTENT="$(bash "$SKILL_DIR/scripts/embed-fonts-css.sh" "$CSS_FILE")"
 
-INPUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
-VAULT_ROOT="${VAULT_ROOT:-$(pwd)}"
+export MAGIC_MD_INPUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
+export MAGIC_MD_VAULT_ROOT="${VAULT_ROOT:-$(pwd)}"
+export MAGIC_MD_DESIGN="$DESIGN"
+
 TMPFILE="$(mktemp /tmp/render-XXXXXX.md)"
 trap 'rm -f "$TMPFILE"' EXIT
-
-python3 "$SKILL_DIR/scripts/preprocess.py" "$INPUT" "$INPUT_DIR" "$VAULT_ROOT" > "$TMPFILE"
+cat "$INPUT" > "$TMPFILE"
 
 # Plugin pipeline: run all executable scripts in plugins/ sorted by filename
 if [[ -d "$PLUGINS_DIR" ]]; then
