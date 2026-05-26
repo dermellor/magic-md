@@ -1,3 +1,5 @@
 *.html
 !scripts/template.html
+designs/*
+!designs/default.css
 .DS_Store
