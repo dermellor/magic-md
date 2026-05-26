@@ -26,14 +26,15 @@ git submodule add https://github.com/dermellor/magic-md.git .skills/render
 
 ## Plugins
 
-All preprocessing runs through plugins in `plugins/`. Two are bundled:
+Everything is a plugin. Three are bundled:
 
 | Plugin | What it does |
 |--------|-------------|
+| `00-design.sh` | Injects CSS design as `<style>` block |
 | `01-image-embeds.py` | `![[image.ext]]` → standard Markdown images |
 | `02-callouts.py` | `> [!type]` → styled HTML divs |
 
-Add your own by dropping an executable script with a numeric prefix. Each plugin reads stdin, writes stdout.
+Add your own by dropping an executable script with a numeric prefix. Each plugin reads stdin, writes stdout. Remove bundled plugins you don't need.
 
 See [SKILL.md](SKILL.md) for full documentation.
 

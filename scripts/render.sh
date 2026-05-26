@@ -2,7 +2,6 @@
 set -euo pipefail
 
 SKILL_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-DESIGNS_DIR="$SKILL_DIR/designs"
 PLUGINS_DIR="$SKILL_DIR/plugins"
 TEMPLATE="$SKILL_DIR/scripts/template.html"
 
@@ -31,24 +30,15 @@ if [[ ! -f "$INPUT" ]]; then
   exit 1
 fi
 
-CSS_FILE="$DESIGNS_DIR/$DESIGN.css"
-if [[ ! -f "$CSS_FILE" ]]; then
-  echo "Error: Design not found: $DESIGN (expected $CSS_FILE)" >&2
-  echo "Available designs:" >&2
-  ls "$DESIGNS_DIR"/*.css 2>/dev/null | xargs -n1 basename | sed 's/\.css$//' >&2
-  exit 1
-fi
-
 if [[ -z "$OUTPUT" ]]; then
   BASENAME="$(basename "$INPUT" .md)"
   OUTPUT="${BASENAME}.html"
 fi
 
-CSS_CONTENT="$(bash "$SKILL_DIR/scripts/embed-fonts-css.sh" "$CSS_FILE")"
-
 export MAGIC_MD_INPUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
 export MAGIC_MD_VAULT_ROOT="${VAULT_ROOT:-$(pwd)}"
 export MAGIC_MD_DESIGN="$DESIGN"
+export MAGIC_MD_DESIGNS_DIR="$SKILL_DIR/designs"
 
 TMPFILE="$(mktemp /tmp/render-XXXXXX.md)"
 trap 'rm -f "$TMPFILE"' EXIT
@@ -56,7 +46,7 @@ cat "$INPUT" > "$TMPFILE"
 
 # Plugin pipeline: run all executable scripts in plugins/ sorted by filename
 if [[ -d "$PLUGINS_DIR" ]]; then
-  for plugin in $(find "$PLUGINS_DIR" -maxdepth 1 -type f -executable 2>/dev/null | sort); do
+  for plugin in $(find "$PLUGINS_DIR" -maxdepth 1 -type f -perm +111 2>/dev/null | sort); do
     PLUGIN_TMPFILE="$(mktemp /tmp/render-plugin-XXXXXX.md)"
     if "$plugin" < "$TMPFILE" > "$PLUGIN_TMPFILE"; then
       mv "$PLUGIN_TMPFILE" "$TMPFILE"
@@ -72,8 +62,6 @@ pandoc "$TMPFILE" \
   --to html5 \
   --standalone \
   --template "$TEMPLATE" \
-  --variable "design-css=$CSS_CONTENT" \
-  --variable "design-name=$DESIGN" \
   --metadata title="$(basename "$INPUT" .md)" \
   --wrap=none \
   -o "$OUTPUT"
